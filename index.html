@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Random Password Generator</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Generate a random password</h1>
+        <div class="password-field">
+            <input type="text" placeholder="Password" readonly>
+            <p class="strength-indicator"></p>
+            <i class="copy-btn fa-solid fa-copy"></i>
+        </div>
+        <p>Include:</p>
+        <div class="char-checkbox">
+            <label class="checkbox-container"  for="uppercase">Uppercase
+            <input type="checkbox" id="uppercase" 
+            value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" checked>
+            <span class="checkmark"></span>
+            </label>
+            <label class="checkbox-container" for="lowercase">Lowercase
+            <input type="checkbox" id="lowercase" 
+            value="abcdefghijklmnopqrstuvwxyz" checked>
+            <span class="checkmark"></span>
+            </label>
+            <label class="checkbox-container" for="digits">Digits
+            <input type="checkbox" id="digits" 
+            value="0123456789" checked>
+            <span class="checkmark"></span>
+            </label>
+            <label class="checkbox-container" for="symbols">Symbols
+            <input type="checkbox" id="symbols" 
+            value="~{}[]'$@^&*()" checked>
+            <span class="checkmark"></span>
+            </label>
+        </div>
+        <p>Password length: <span class="slider-value"></span></p>
+        <div class="password-length-container">
+            <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
+            <input id="password-length" type="range" min="4" max="50" value="12">
+            <button class="minus-btn"><i class="fa-solid fa-minus"></i></button>
+        </div>
+        <button class="generate-btn">Generate</button>
+        <div class="strength-indicator-container">
+            <p class="strength-indicator"></p>
+        </div>
+    </div>
+    
+<script>
+    const passwordField = document.querySelector(".password-field input")
+    const generateBtn = document.querySelector(".generate-btn")
+    const length = document.getElementById('password-length');
+    const uppercaseCheckbox = document.querySelector('#uppercase')
+    const lowercaseCheckbox = document.querySelector('#lowercase')
+    const digitsCheckbox = document.querySelector('#digits')
+    const symbolsCheckbox = document.querySelector('#symbols')
+
+    const checkBoxes = [uppercaseCheckbox,lowercaseCheckbox,digitsCheckbox,symbolsCheckbox]
+    
+    const strengthIndicator = document.querySelector(".strength-indicator")
+    
+
+
+
+    let checkedBox = 4
+    for(let i = 0 ; i < checkBoxes.length; i++){
+    checkBoxes[i].onchange = (e) =>{
+        if(checkBoxes[i].checked == true){
+            checkedBox++
+        }else if(checkBoxes[i].checked == false){
+            checkedBox --
+        }
+        if(checkedBox === 1){
+            checkBoxes.forEach((checkbox)=>{
+                if(checkbox.checked == true){
+                    checkbox.disabled = true
+                }
+            })
+        }else{
+            checkBoxes.forEach((checkbox)=>{
+                if(checkbox.checked == true){
+                    checkbox.disabled = false
+                }
+            })       
+            
+        }
+        generatePassword()
+        }
+    }
+
+    generatePassword = () =>{
+        let password=''
+        while (length.valueAsNumber > password.length){
+        checkBoxes.forEach((checkbox)=>{
+            if(checkbox.checked){
+                password += checkbox.value[Math.floor
+                (Math.random()*checkbox.value.length)]              
+            }
+        })
+        }
+   
+        passwordField.value = password.slice(0,length.valueAsNumber)
+
+        if(passwordField.value.length >= 10 || (symbolsCheckbox.checked && passwordField.value.length >=6)){
+            strengthIndicator.textContent = "Very Strong!"
+            strengthIndicator.classList.remove("strong","good","weak")
+            strengthIndicator.classList.add("very-strong")
+        }else if(passwordField.value.length >=8 && passwordField.value.length < 10){
+            strengthIndicator.textContent = "Strong!"
+            strengthIndicator.classList.remove("very-strong","good","weak")
+            strengthIndicator.classList.add("strong")
+        }else if((passwordField.value.length >= 6 && passwordField.value.length< 8) || (symbolsCheckbox.checked && passwordField.value.length >= 4)){
+            strengthIndicator.textContent = "Good!"
+            strengthIndicator.classList.remove("very-strong","strong","weak")
+            strengthIndicator.classList.add("good")
+        }else if(passwordField.value.length>=4 && passwordField.value.length < 6){
+            strengthIndicator.textContent = "Weak!"
+            strengthIndicator.classList.remove("very-strong","good","strong")
+            strengthIndicator.classList.add("weak")
+        }
+
+    }
+
+    generateBtn.addEventListener("click", e =>{
+        generatePassword()
+    })
+
+    const sliderValue = document.querySelector(".slider-value")
+    sliderValue.textContent = length.value
+
+    length.oninput = () =>{
+        sliderValue.textContent = length.valueAsNumber
+        generatePassword()
+    }
+
+    const copyIcon = document.querySelector(".copy-btn")
+    const notif = document.querySelector(".notif")
+
+    copyPassword = () =>{
+        passwordField.select();
+        document.execCommand("copy")
+    }
+
+    copyIcon.addEventListener("click", e =>{
+        copyPassword()
+        notif.textContent = "Copied!"
+        //notif.classList.add(".disappear")
+    })
+
+    const plusBtn = document.querySelector(".plus-btn")
+    const minusBtn = document.querySelector(".minus-btn")
+
+    plusBtn.addEventListener("click", e =>{
+        length.valueAsNumber++
+        sliderValue.textContent = length.valueAsNumber
+        generatePassword()
+    })
+
+    minusBtn.addEventListener("click", e =>{
+        length.valueAsNumber--
+        sliderValue.textContent = length.valueAsNumber
+        generatePassword()
+    })
+
+</script>
+</body>
+</html>
